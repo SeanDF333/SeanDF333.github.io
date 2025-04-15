@@ -5734,11 +5734,8 @@ html.is-animating .transition-fade-down {
   }
 }
 .post-page-container .article-content-container .article-header .avatar img {
-  border-radius: 12.18px;
-  width: 150px;
-  height: 150px;
-  object-fit: cover;
-  overflow: hidden;
+  width: 100%;
+  height: 100%;
 }
 .post-page-container .article-content-container .article-header,
 .post-page-container .article-content-container .article-header-meta-info {
