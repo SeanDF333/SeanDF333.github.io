@@ -30,7 +30,7 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://seandf333.github.io/images/redefine-og.webp">
 <meta property="article:published_time" content="2025-04-17T16:00:00.000Z">
-<meta property="article:modified_time" content="2025-04-22T12:02:23.466Z">
+<meta property="article:modified_time" content="2025-04-22T12:18:26.596Z">
 <meta property="article:author" content="Xiaoyan Fan">
 <meta property="article:tag" content="IRL">
 <meta property="article:tag" content="RL">
@@ -111,7 +111,119 @@
     
     
     
-<meta name="generator" content="Hexo 7.3.0"></head>
+<meta name="generator" content="Hexo 7.3.0"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
 
 
 
@@ -457,8 +569,8 @@
     
         <span class="article-date article-meta-item">
             <i class="fa-regular fa-wrench"></i>&nbsp;
-            <span class="desktop">2025-04-22 20:02:23</span>
-            <span class="mobile">2025-04-22 20:02:23</span>
+            <span class="desktop">2025-04-22 20:18:26</span>
+            <span class="mobile">2025-04-22 20:18:26</span>
             <span class="hover-info">Updated</span>
         </span>
     
@@ -472,7 +584,7 @@
                     
                         
                         <li>
-                            <a href="/categories/Reinforcement-Learning-LLM/">Reinforcement Learning, LLM</a>&nbsp;
+                            <a href="/categories/RL/">RL</a>&nbsp;
                         </li>
                     
                     
@@ -532,7 +644,7 @@ Recently, IRL has been extended to fine‑tune **Large Language Models (LLMs)** 
 
 ---
 
-## 1. Introduction : Why We Need &quot;I&quot;
+## 1. Introduction : Why We Need "I"
 
 Inverse Reinforcement Learning tackles the inverse problem of standard RL by inferring the underlying reward function from observed expert behavior rather than optimizing a predefined reward.  
 
@@ -549,24 +661,24 @@ However, classical IRL assumes a single agent and known dynamics, which can misa
 In Reinforcement Learning, the agent learns to maximize a predefined reward function through interactions with the environment. The environment is typically modeled as a Markov Decision Process (MDP):
 
 $$
-\text&#123;MDP&#125; = (\mathcal&#123;S&#125;, \mathcal&#123;A&#125;, P, r, \gamma)
+\text{MDP} = (\mathcal{S}, \mathcal{A}, P, r, \gamma)
 $$
 
 Where:
 
-- $\mathcal&#123;S&#125;$: State space  
-- $\mathcal&#123;A&#125;$: Action space  
-- $P(s&#39;|s,a)$: Transition probability  
+- $\mathcal{S}$: State space  
+- $\mathcal{A}$: Action space  
+- $P(s'|s,a)$: Transition probability  
 - $r(s,a)$: Reward function  
 - $\gamma$: Discount factor
 
 The objective is to find a policy $\pi(a|s)$ that maximizes the expected cumulative reward:
 
 $$
-J(\pi) = \mathbb&#123;E&#125;_\pi\left[\sum_&#123;t=0&#125;^\infty \gamma^t r(s_t, a_t)\right]
+J(\pi) = \mathbb{E}_\pi\left[\sum_{t=0}^\infty \gamma^t r(s_t, a_t)\right]
 $$
 
-In contrast, Inverse Reinforcement Learning seeks to infer the underlying reward function *r* given observed expert behavior, typically in the form of state-action trajectories. The goal is to find a reward function under which the expert&#39;s policy is optimal.
+In contrast, Inverse Reinforcement Learning seeks to infer the underlying reward function *r* given observed expert behavior, typically in the form of state-action trajectories. The goal is to find a reward function under which the expert's policy is optimal.
 
 
 ### 2.2 Representative IRL Algorithms
@@ -574,16 +686,16 @@ In contrast, Inverse Reinforcement Learning seeks to infer the underlying reward
 #### 2.2.1 Linear Programming IRL (Ng &amp; Russell, 2000)
 Abbeel &amp; Ng 提出 **学徒学习（Apprenticeship Learning）**，利用专家示范数据估计特征期望 μ\_E，并通过最大间隔优化，迭代地生成能使 μ(π) 与 μ\_E 逼近的策略。其核心优化目标为：
 \[
-\max_&#123;w&#125; \; \min_&#123;\pi \in \Pi&#125; \; w^\top (\mu_E - \mu(\pi)),\quad \|w\|_2 \le 1
+\max_{w} \; \min_{\pi \in \Pi} \; w^\top (\mu_E - \mu(\pi)),\quad \|w\|_2 \le 1
 \]
-通过对偶算法等手段高效求解 :contentReference[oaicite:2]&#123;index=2&#125;。
+通过对偶算法等手段高效求解 :contentReference[oaicite:2]{index=2}。
 
 #### 2.2.1 
 为解决多解性与不确定性，最大熵 IRL 在策略分布上引入熵项，定义轨迹 τ 的概率为：
 \[
-P(τ|w) \propto \exp\bigl(\sum_&#123;t&#125; w^\top \phi(s_t)\bigr)
+P(τ|w) \propto \exp\bigl(\sum_{t} w^\top \phi(s_t)\bigr)
 \]
-通过极大化示范轨迹的对数似然并加入熵正则化，实现对专家行为分布的平滑拟合 :contentReference[oaicite:3]&#123;index=3&#125;。
+通过极大化示范轨迹的对数似然并加入熵正则化，实现对专家行为分布的平滑拟合 :contentReference[oaicite:3]{index=3}。
 
 ---
 
@@ -592,7 +704,7 @@ P(τ|w) \propto \exp\bigl(\sum_&#123;t&#125; w^\top \phi(s_t)\bigr)
 Arora &amp; Doshi (2018) 系统综述了 IRL 的核心挑战，包括  
 1. **推断准确性**：受限于状态空间维度与示范质量  
 2. **泛化能力**：奖励函数在新场景的迁移性  
-3. **计算复杂度**：解空间随任务规模指数增长 :contentReference[oaicite:4]&#123;index=4&#125;  
+3. **计算复杂度**：解空间随任务规模指数增长 :contentReference[oaicite:4]{index=4}  
 
 他们分类讨论了处理不完全观测、模型不确定、多重奖励与非线性奖励的方法，为后续研究指明了方向。
 
@@ -603,30 +715,30 @@ Arora &amp; Doshi (2018) 系统综述了 IRL 的核心挑战，包括
 ### 4.1 对抗逆强化学习 (Adversarial IRL)  
 Fu et al. (2017) 将 GAN 思想引入 IRL，通过生成网络生成策略、判别网络区分专家/策略轨迹，优化目标为  
 \[
-\min_\pi \max_D \; \mathbb&#123;E&#125;_&#123;τ\sim\pi_E&#125;[\log D(τ)] + \mathbb&#123;E&#125;_&#123;τ\sim\pi&#125;[\log(1 - D(τ))]
+\min_\pi \max_D \; \mathbb{E}_{τ\sim\pi_E}[\log D(τ)] + \mathbb{E}_{τ\sim\pi}[\log(1 - D(τ))]
 \]
-有效提升了在复杂环境下的学习效率与鲁棒性 :contentReference[oaicite:5]&#123;index=5&#125;。
+有效提升了在复杂环境下的学习效率与鲁棒性 :contentReference[oaicite:5]{index=5}。
 
 ### 4.2 贝叶斯 IRL  
 Ramachandran &amp; Amir (2007) 将奖励函数视为随机变量，利用贝叶斯推断计算后验分布：
 \[
 P(R|D) \propto P(D|R)\,P(R)
 \]
-其中 \(P(D|R)\) 表示在给定奖励下生成专家示范的概率，增强了对示范噪声的鲁棒性 :contentReference[oaicite:6]&#123;index=6&#125;。
+其中 \(P(D|R)\) 表示在给定奖励下生成专家示范的概率，增强了对示范噪声的鲁棒性 :contentReference[oaicite:6]{index=6}。
 
 ### 4.3 深度成本学习 (Guided Cost Learning)  
 Finn et al. (2016) 以最大熵 IRL 为基础，采用神经网络拟合奖励函数，并结合策略优化，提出目标：
 \[
-\min_θ \; -\sum_&#123;τ \in D_E&#125; \log P(τ|θ) + \lambda \sum_&#123;τ \in D_&#123;π_θ&#125;&#125; \exp\bigl(\sum_t r_θ(s_t)\bigr)
+\min_θ \; -\sum_{τ \in D_E} \log P(τ|θ) + \lambda \sum_{τ \in D_{π_θ}} \exp\bigl(\sum_t r_θ(s_t)\bigr)
 \]
-显著提升了高维连续控制场景下的性能 :contentReference[oaicite:7]&#123;index=7&#125;。
+显著提升了高维连续控制场景下的性能 :contentReference[oaicite:7]{index=7}。
 
 ### 4.4 相对熵 IRL (Relative Entropy IRL)  
 Boularias et al. (2011) 通过最小化策略分布与专家分布的相对熵，实现奖励函数学习：
 \[
-\min_R \; D_&#123;\mathrm&#123;KL&#125;&#125;\bigl(P(τ|\pi_E)\,\|\,P(τ|\pi_R)\bigr)
+\min_R \; D_{\mathrm{KL}}\bigl(P(τ|\pi_E)\,\|\,P(τ|\pi_R)\bigr)
 \]
-简化了对最优策略求解的依赖，提高了样本效率 :contentReference[oaicite:8]&#123;index=8&#125;。
+简化了对最优策略求解的依赖，提高了样本效率 :contentReference[oaicite:8]{index=8}。
 
 ---
 
@@ -634,9 +746,9 @@ Boularias et al. (2011) 通过最小化策略分布与专家分布的相对熵�
 
 **I​mitating Language via Scalable IRL** (2024) 将 IRL 应用于大语言模型的微调，提出“逆软 Q 学习”（Inverse Soft Q‑Learning）：
 \[
-L_&#123;\mathrm&#123;IRL&#125;&#125; = -\sum_&#123;x,y&#125;\bigl[Q(s,a) - \gamma\,V(s&#39;)\bigr] + \alpha\,\|\theta\|^2
+L_{\mathrm{IRL}} = -\sum_{x,y}\bigl[Q(s,a) - \gamma\,V(s')\bigr] + \alpha\,\|\theta\|^2
 \]
-其中 Q 与 V 由模型参数 θ 定义，并结合时序差分正则化，以序列级别的“未来影响”替代逐 token 的 MLE 优化，从而提高生成连贯性与对齐度 :contentReference[oaicite:9]&#123;index=9&#125;。
+其中 Q 与 V 由模型参数 θ 定义，并结合时序差分正则化，以序列级别的“未来影响”替代逐 token 的 MLE 优化，从而提高生成连贯性与对齐度 :contentReference[oaicite:9]{index=9}。
 
 ---
 
@@ -658,7 +770,7 @@ L_&#123;\mathrm&#123;IRL&#125;&#125; = -\sum_&#123;x,y&#125;\bigl[Q(s,a) - \gamm
         
             <li>
                 <strong>Updated at
-                    :</strong> 2025-04-22 20:02:23
+                    :</strong> 2025-04-22 20:18:26
             </li>
         
         <li>
