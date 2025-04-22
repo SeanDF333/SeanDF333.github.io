@@ -30,7 +30,7 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://seandf333.github.io/images/redefine-og.webp">
 <meta property="article:published_time" content="2025-04-17T16:00:00.000Z">
-<meta property="article:modified_time" content="2025-04-22T12:24:13.026Z">
+<meta property="article:modified_time" content="2025-04-22T13:23:19.076Z">
 <meta property="article:author" content="Xiaoyan Fan">
 <meta property="article:tag" content="IRL">
 <meta property="article:tag" content="RL">
@@ -569,8 +569,8 @@ mjx-container[display="true"] + br {
     
         <span class="article-date article-meta-item">
             <i class="fa-regular fa-wrench"></i>&nbsp;
-            <span class="desktop">2025-04-22 20:24:13</span>
-            <span class="mobile">2025-04-22 20:24:13</span>
+            <span class="desktop">2025-04-22 21:23:19</span>
+            <span class="mobile">2025-04-22 21:23:19</span>
             <span class="hover-info">Updated</span>
         </span>
     
@@ -632,130 +632,46 @@ mjx-container[display="true"] + br {
 
 
 		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
-			<pre><code class="language-markdown">
-## Abstract
-
-**Inverse Reinforcement Learning (IRL)** enables agents to infer reward functions by observing expert behavior, addressing the challenges of manual reward design and bias in traditional **Reinforcement Learning (RL)**. 
-
-While classical IRL methods, such as linear programming IRL and Apprenticeship Learning, laid the groundwork, they often suffer from **multiple valid reward functions and limited generalization**.**Cooperative IRL (CIRL)** reframes IRL as a human–agent cooperative game, allowing the agent to learn the true reward through iterative interaction with a human who knows the reward. 
-
-Recently, IRL has been extended to fine‑tune **Large Language Models (LLMs)** by extracting sequence‑level rewards via inverse soft Q‑learning, offering improvements in generation diversity and alignment over token‑level **maximum likelihood estimation (MLE)**. Despite these advances, open questions remain in scalability, reward identifiability, and robustness when applying IRL and CIRL to complex, high‑dimensional LLM settings.
-
-
----
-
-## 1. Introduction : Why We Need "I"
-
-Inverse Reinforcement Learning tackles the inverse problem of standard RL by inferring the underlying reward function from observed expert behavior rather than optimizing a predefined reward.  
-
-In LLMs, IRL offers the potential to extract human‑aligned sequence‑level rewards, moving beyond token‑level supervision (MLE) and thus improving generation coherence and adherence to human preferences.
-
-However, classical IRL assumes a single agent and known dynamics, which can misalign with human intent; **Cooperative Inverse Reinforcement Learning (CIRL)** addresses this by modeling human and agent as collaborators maximizing a shared but partially known reward, thus enabling more robust human–LLM alignment.
-
----
-
-## 2. Traditional IRL 
-
-### 2.1 Reinforcement Learning vs. Inverse Reinforcement Learning 
-
-In Reinforcement Learning, the agent learns to maximize a predefined reward function through interactions with the environment. The environment is typically modeled as a Markov Decision Process (MDP):
-
-$$
-\text{MDP} = (\mathcal{S}, \mathcal{A}, P, r, \gamma)
-$$
-
-Where:
-
-- $\mathcal{S}$: State space  
-- $\mathcal{A}$: Action space  
-- $P(s'|s,a)$: Transition probability  
-- $r(s,a)$: Reward function  
-- $\gamma$: Discount factor
-
-The objective is to find a policy $\pi(a|s)$ that maximizes the expected cumulative reward:
-
-$$
-J(\pi) = \mathbb{E}_\pi\left[\sum_{t=0}^\infty \gamma^t r(s_t, a_t)\right]
-$$
-
-In contrast, Inverse Reinforcement Learning seeks to infer the underlying reward function *r* given observed expert behavior, typically in the form of state-action trajectories. The goal is to find a reward function under which the expert's policy is optimal.
-
-
-### 2.2 Representative IRL Algorithms
-
-#### 2.2.1 Linear Programming IRL (Ng &amp; Russell, 2000)
-Abbeel &amp; Ng 提出 **学徒学习（Apprenticeship Learning）**，利用专家示范数据估计特征期望 μ\_E，并通过最大间隔优化，迭代地生成能使 μ(π) 与 μ\_E 逼近的策略。其核心优化目标为：
-\[
-\max_{w} \; \min_{\pi \in \Pi} \; w^\top (\mu_E - \mu(\pi)),\quad \|w\|_2 \le 1
-\]
-通过对偶算法等手段高效求解 :contentReference[oaicite:2]{index=2}。
-
-#### 2.2.1 
-为解决多解性与不确定性，最大熵 IRL 在策略分布上引入熵项，定义轨迹 τ 的概率为：
-\[
-P(τ|w) \propto \exp\bigl(\sum_{t} w^\top \phi(s_t)\bigr)
-\]
-通过极大化示范轨迹的对数似然并加入熵正则化，实现对专家行为分布的平滑拟合 :contentReference[oaicite:3]{index=3}。
-
----
-
-## 3. Morden IRL 
-
-Arora &amp; Doshi (2018) 系统综述了 IRL 的核心挑战，包括  
-1. **推断准确性**：受限于状态空间维度与示范质量  
-2. **泛化能力**：奖励函数在新场景的迁移性  
-3. **计算复杂度**：解空间随任务规模指数增长 :contentReference[oaicite:4]{index=4}  
-
-他们分类讨论了处理不完全观测、模型不确定、多重奖励与非线性奖励的方法，为后续研究指明了方向。
-
----
-
-## 4. IRL for LLMs
-
-### 4.1 对抗逆强化学习 (Adversarial IRL)  
-Fu et al. (2017) 将 GAN 思想引入 IRL，通过生成网络生成策略、判别网络区分专家/策略轨迹，优化目标为  
-\[
-\min_\pi \max_D \; \mathbb{E}_{τ\sim\pi_E}[\log D(τ)] + \mathbb{E}_{τ\sim\pi}[\log(1 - D(τ))]
-\]
-有效提升了在复杂环境下的学习效率与鲁棒性 :contentReference[oaicite:5]{index=5}。
-
-### 4.2 贝叶斯 IRL  
-Ramachandran &amp; Amir (2007) 将奖励函数视为随机变量，利用贝叶斯推断计算后验分布：
-\[
-P(R|D) \propto P(D|R)\,P(R)
-\]
-其中 \(P(D|R)\) 表示在给定奖励下生成专家示范的概率，增强了对示范噪声的鲁棒性 :contentReference[oaicite:6]{index=6}。
-
-### 4.3 深度成本学习 (Guided Cost Learning)  
-Finn et al. (2016) 以最大熵 IRL 为基础，采用神经网络拟合奖励函数，并结合策略优化，提出目标：
-\[
-\min_θ \; -\sum_{τ \in D_E} \log P(τ|θ) + \lambda \sum_{τ \in D_{π_θ}} \exp\bigl(\sum_t r_θ(s_t)\bigr)
-\]
-显著提升了高维连续控制场景下的性能 :contentReference[oaicite:7]{index=7}。
-
-### 4.4 相对熵 IRL (Relative Entropy IRL)  
-Boularias et al. (2011) 通过最小化策略分布与专家分布的相对熵，实现奖励函数学习：
-\[
-\min_R \; D_{\mathrm{KL}}\bigl(P(τ|\pi_E)\,\|\,P(τ|\pi_R)\bigr)
-\]
-简化了对最优策略求解的依赖，提高了样本效率 :contentReference[oaicite:8]{index=8}。
-
----
-
-## 5. Future Outlook
-
-**I​mitating Language via Scalable IRL** (2024) 将 IRL 应用于大语言模型的微调，提出“逆软 Q 学习”（Inverse Soft Q‑Learning）：
-\[
-L_{\mathrm{IRL}} = -\sum_{x,y}\bigl[Q(s,a) - \gamma\,V(s')\bigr] + \alpha\,\|\theta\|^2
-\]
-其中 Q 与 V 由模型参数 θ 定义，并结合时序差分正则化，以序列级别的“未来影响”替代逐 token 的 MLE 优化，从而提高生成连贯性与对齐度 :contentReference[oaicite:9]{index=9}。
-
----
-
-## 6. Reference
-
-逆强化学习自 Ng &amp; Russell (2000) 的 LP 框架，到最大熵 IRL 与现代对抗／贝叶斯方法，再到可扩展 IRL 在 LLM 微调中的应用，已形成从理论到实践的完整谱系。面向大模型的 IRL 可将对齐问题转化为**序列级奖励推断**，为下一代高质量、可控生成模型提供了新的思路。未来可结合在线／离线混合训练、多源偏好数据融合及不确定性驱动采样机制，进一步提升 IRL 在大规模场景中的可扩展性与稳健性。  
-</code></pre>
+			<h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p><strong>Inverse Reinforcement Learning (IRL)</strong> enables agents to infer reward functions by observing expert behavior, addressing the challenges of manual reward design and bias in traditional <strong>Reinforcement Learning (RL)</strong>. </p>
+<p>While classical IRL methods, such as linear programming IRL and Apprenticeship Learning, laid the groundwork, they often suffer from <strong>multiple valid reward functions and limited generalization</strong>.<strong>Cooperative IRL (CIRL)</strong> reframes IRL as a human–agent cooperative game, allowing the agent to learn the true reward through iterative interaction with a human who knows the reward. </p>
+<p>Recently, IRL has been extended to fine‑tune <strong>Large Language Models (LLMs)</strong> by extracting sequence‑level rewards via inverse soft Q‑learning, offering improvements in generation diversity and alignment over token‑level <strong>maximum likelihood estimation (MLE)</strong>. Despite these advances, open questions remain in scalability, reward identifiability, and robustness when applying IRL and CIRL to complex, high‑dimensional LLM settings.</p>
+<hr>
+<h2 id="1-Introduction-Why-We-Need-“I”"><a href="#1-Introduction-Why-We-Need-“I”" class="headerlink" title="1. Introduction : Why We Need “I”"></a>1. Introduction : Why We Need “I”</h2><p>Inverse Reinforcement Learning tackles the inverse problem of standard RL by inferring the underlying reward function from observed expert behavior rather than optimizing a predefined reward.  </p>
+<p>In LLMs, IRL offers the potential to extract human‑aligned sequence‑level rewards, moving beyond token‑level supervision (MLE) and thus improving generation coherence and adherence to human preferences.</p>
+<p>However, classical IRL assumes a single agent and known dynamics, which can misalign with human intent; <strong>Cooperative Inverse Reinforcement Learning (CIRL)</strong> addresses this by modeling human and agent as collaborators maximizing a shared but partially known reward, thus enabling more robust human–LLM alignment.</p>
+<hr>
+<h2 id="2-Traditional-IRL"><a href="#2-Traditional-IRL" class="headerlink" title="2. Traditional IRL"></a>2. Traditional IRL</h2><h3 id="2-1-Reinforcement-Learning-vs-Inverse-Reinforcement-Learning"><a href="#2-1-Reinforcement-Learning-vs-Inverse-Reinforcement-Learning" class="headerlink" title="2.1 Reinforcement Learning vs. Inverse Reinforcement Learning"></a>2.1 Reinforcement Learning vs. Inverse Reinforcement Learning</h3><p>In Reinforcement Learning, the agent learns to maximize a predefined reward function through interactions with the environment. The environment is typically modeled as a Markov Decision Process (MDP):</p>
+<p><mjx-container class="MathJax" jax="SVG" display="true"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="21.399ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 9458.2 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mtext"><path data-c="4D" d="M132 622Q125 629 121 631T105 634T62 637H29V683H135Q221 683 232 682T249 675Q250 674 354 398L458 124L562 398Q666 674 668 675Q671 681 683 682T781 683H887V637H854Q814 636 803 634T785 622V61Q791 51 802 49T854 46H887V0H876Q855 3 736 3Q605 3 596 0H585V46H618Q660 47 669 49T688 61V347Q688 424 688 461T688 546T688 613L687 632Q454 14 450 7Q446 1 430 1T410 7Q409 9 292 316L176 624V606Q175 588 175 543T175 463T175 356L176 86Q187 50 261 46H278V0H269Q254 3 154 3Q52 3 37 0H29V46H46Q78 48 98 56T122 69T132 86V622Z"></path><path data-c="44" d="M130 622Q123 629 119 631T103 634T60 637H27V683H228Q399 682 419 682T461 676Q504 667 546 641T626 573T685 470T708 336Q708 210 634 116T442 3Q429 1 228 0H27V46H60Q102 47 111 49T130 61V622ZM593 338Q593 439 571 501T493 602Q439 637 355 637H322H294Q238 637 234 628Q231 624 231 344Q231 62 232 59Q233 49 248 48T339 46H350Q456 46 515 95Q561 133 577 191T593 338Z" transform="translate(917,0)"></path><path data-c="50" d="M130 622Q123 629 119 631T103 634T60 637H27V683H214Q237 683 276 683T331 684Q419 684 471 671T567 616Q624 563 624 489Q624 421 573 372T451 307Q429 302 328 301H234V181Q234 62 237 58Q245 47 304 46H337V0H326Q305 3 182 3Q47 3 38 0H27V46H60Q102 47 111 49T130 61V622ZM507 488Q507 514 506 528T500 564T483 597T450 620T397 635Q385 637 307 637H286Q237 637 234 628Q231 624 231 483V342H302H339Q390 342 423 349T481 382Q507 411 507 488Z" transform="translate(1681,0)"></path></g><g data-mml-node="mo" transform="translate(2639.8,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mo" transform="translate(3695.6,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="TeXAtom" data-mjx-texclass="ORD" transform="translate(4084.6,0)"><g data-mml-node="mi"><path data-c="53" d="M554 512Q536 512 536 522Q536 525 539 539T542 564Q542 588 528 604Q515 616 482 625T410 635Q374 635 349 624T312 594T295 561T290 532Q290 505 303 482T342 442T378 419T409 404Q435 391 451 383T494 357T535 323T562 282T574 231Q574 133 464 56T220 -22Q138 -22 78 21T18 123Q18 184 61 227T156 274Q178 274 178 263Q178 260 177 258Q172 247 164 239T151 227T136 218L127 213L124 202Q118 186 118 163Q120 124 165 86T292 48Q374 48 423 86T473 186V193Q473 267 347 327Q268 364 239 389Q191 431 191 486Q191 547 242 600T356 679T470 705Q472 705 478 705T489 704Q551 704 596 682T642 610Q642 566 621 545Q592 516 554 512Z"></path></g></g><g data-mml-node="mo" transform="translate(4726.6,0)"><path data-c="2C" d="M78 35T78 60T94 103T137 121Q165 121 187 96T210 8Q210 -27 201 -60T180 -117T154 -158T130 -185T117 -194Q113 -194 104 -185T95 -172Q95 -168 106 -156T131 -126T157 -76T173 -3V9L172 8Q170 7 167 6T161 3T152 1T140 0Q113 0 96 17Z"></path></g><g data-mml-node="TeXAtom" data-mjx-texclass="ORD" transform="translate(5171.2,0)"><g data-mml-node="mi"><path data-c="41" d="M576 668Q576 688 606 708T660 728Q676 728 675 712V571Q675 409 688 252Q696 122 720 57Q722 53 723 50T728 46T732 43T737 41T743 39L754 45Q788 61 803 61Q819 61 819 47Q818 43 814 35Q799 15 755 -7T675 -30Q659 -30 648 -25T630 -8T621 11T614 34Q603 77 599 106T594 146T591 160V163H460L329 164L316 145Q241 35 196 -7T119 -50T59 -24T30 43Q30 75 46 100T74 125Q81 125 83 120T88 104T96 84Q118 57 151 57Q189 57 277 182Q432 400 542 625L559 659H567Q574 659 575 660T576 668ZM584 249Q579 333 577 386T575 473T574 520V581L563 560Q497 426 412 290L372 228L370 224H371L383 228L393 232H586L584 249Z"></path></g></g><g data-mml-node="mo" transform="translate(5990.2,0)"><path data-c="2C" d="M78 35T78 60T94 103T137 121Q165 121 187 96T210 8Q210 -27 201 -60T180 -117T154 -158T130 -185T117 -194Q113 -194 104 -185T95 -172Q95 -168 106 -156T131 -126T157 -76T173 -3V9L172 8Q170 7 167 6T161 3T152 1T140 0Q113 0 96 17Z"></path></g><g data-mml-node="mi" transform="translate(6434.9,0)"><path data-c="1D443" d="M287 628Q287 635 230 637Q206 637 199 638T192 648Q192 649 194 659Q200 679 203 681T397 683Q587 682 600 680Q664 669 707 631T751 530Q751 453 685 389Q616 321 507 303Q500 302 402 301H307L277 182Q247 66 247 59Q247 55 248 54T255 50T272 48T305 46H336Q342 37 342 35Q342 19 335 5Q330 0 319 0Q316 0 282 1T182 2Q120 2 87 2T51 1Q33 1 33 11Q33 13 36 25Q40 41 44 43T67 46Q94 46 127 49Q141 52 146 61Q149 65 218 339T287 628ZM645 554Q645 567 643 575T634 597T609 619T560 635Q553 636 480 637Q463 637 445 637T416 636T404 636Q391 635 386 627Q384 621 367 550T332 412T314 344Q314 342 395 342H407H430Q542 342 590 392Q617 419 631 471T645 554Z"></path></g><g data-mml-node="mo" transform="translate(7185.9,0)"><path data-c="2C" d="M78 35T78 60T94 103T137 121Q165 121 187 96T210 8Q210 -27 201 -60T180 -117T154 -158T130 -185T117 -194Q113 -194 104 -185T95 -172Q95 -168 106 -156T131 -126T157 -76T173 -3V9L172 8Q170 7 167 6T161 3T152 1T140 0Q113 0 96 17Z"></path></g><g data-mml-node="mi" transform="translate(7630.6,0)"><path data-c="1D45F" d="M21 287Q22 290 23 295T28 317T38 348T53 381T73 411T99 433T132 442Q161 442 183 430T214 408T225 388Q227 382 228 382T236 389Q284 441 347 441H350Q398 441 422 400Q430 381 430 363Q430 333 417 315T391 292T366 288Q346 288 334 299T322 328Q322 376 378 392Q356 405 342 405Q286 405 239 331Q229 315 224 298T190 165Q156 25 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 114 189T154 366Q154 405 128 405Q107 405 92 377T68 316T57 280Q55 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(8081.6,0)"><path data-c="2C" d="M78 35T78 60T94 103T137 121Q165 121 187 96T210 8Q210 -27 201 -60T180 -117T154 -158T130 -185T117 -194Q113 -194 104 -185T95 -172Q95 -168 106 -156T131 -126T157 -76T173 -3V9L172 8Q170 7 167 6T161 3T152 1T140 0Q113 0 96 17Z"></path></g><g data-mml-node="mi" transform="translate(8526.2,0)"><path data-c="1D6FE" d="M31 249Q11 249 11 258Q11 275 26 304T66 365T129 418T206 441Q233 441 239 440Q287 429 318 386T371 255Q385 195 385 170Q385 166 386 166L398 193Q418 244 443 300T486 391T508 430Q510 431 524 431H537Q543 425 543 422Q543 418 522 378T463 251T391 71Q385 55 378 6T357 -100Q341 -165 330 -190T303 -216Q286 -216 286 -188Q286 -138 340 32L346 51L347 69Q348 79 348 100Q348 257 291 317Q251 355 196 355Q148 355 108 329T51 260Q49 251 47 251Q45 249 31 249Z"></path></g><g data-mml-node="mo" transform="translate(9069.2,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container></p>
+<p>Where:</p>
+<ul>
+<li><mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.05ex;" xmlns="http://www.w3.org/2000/svg" width="1.452ex" height="1.645ex" role="img" focusable="false" viewBox="0 -705 642 727"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="53" d="M554 512Q536 512 536 522Q536 525 539 539T542 564Q542 588 528 604Q515 616 482 625T410 635Q374 635 349 624T312 594T295 561T290 532Q290 505 303 482T342 442T378 419T409 404Q435 391 451 383T494 357T535 323T562 282T574 231Q574 133 464 56T220 -22Q138 -22 78 21T18 123Q18 184 61 227T156 274Q178 274 178 263Q178 260 177 258Q172 247 164 239T151 227T136 218L127 213L124 202Q118 186 118 163Q120 124 165 86T292 48Q374 48 423 86T473 186V193Q473 267 347 327Q268 364 239 389Q191 431 191 486Q191 547 242 600T356 679T470 705Q472 705 478 705T489 704Q551 704 596 682T642 610Q642 566 621 545Q592 516 554 512Z"></path></g></g></g></g></svg></mjx-container>: State space  </li>
+<li><mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.113ex;" xmlns="http://www.w3.org/2000/svg" width="1.853ex" height="1.76ex" role="img" focusable="false" viewBox="0 -728 819 778"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mi"><path data-c="41" d="M576 668Q576 688 606 708T660 728Q676 728 675 712V571Q675 409 688 252Q696 122 720 57Q722 53 723 50T728 46T732 43T737 41T743 39L754 45Q788 61 803 61Q819 61 819 47Q818 43 814 35Q799 15 755 -7T675 -30Q659 -30 648 -25T630 -8T621 11T614 34Q603 77 599 106T594 146T591 160V163H460L329 164L316 145Q241 35 196 -7T119 -50T59 -24T30 43Q30 75 46 100T74 125Q81 125 83 120T88 104T96 84Q118 57 151 57Q189 57 277 182Q432 400 542 625L559 659H567Q574 659 575 660T576 668ZM584 249Q579 333 577 386T575 473T574 520V581L563 560Q497 426 412 290L372 228L370 224H371L383 228L393 232H586L584 249Z"></path></g></g></g></g></svg></mjx-container>: Action space  </li>
+<li><mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="9.041ex" height="2.283ex" role="img" focusable="false" viewBox="0 -759 3996.1 1009"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D443" d="M287 628Q287 635 230 637Q206 637 199 638T192 648Q192 649 194 659Q200 679 203 681T397 683Q587 682 600 680Q664 669 707 631T751 530Q751 453 685 389Q616 321 507 303Q500 302 402 301H307L277 182Q247 66 247 59Q247 55 248 54T255 50T272 48T305 46H336Q342 37 342 35Q342 19 335 5Q330 0 319 0Q316 0 282 1T182 2Q120 2 87 2T51 1Q33 1 33 11Q33 13 36 25Q40 41 44 43T67 46Q94 46 127 49Q141 52 146 61Q149 65 218 339T287 628ZM645 554Q645 567 643 575T634 597T609 619T560 635Q553 636 480 637Q463 637 445 637T416 636T404 636Q391 635 386 627Q384 621 367 550T332 412T314 344Q314 342 395 342H407H430Q542 342 590 392Q617 419 631 471T645 554Z"></path></g><g data-mml-node="mo" transform="translate(751,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="msup" transform="translate(1140,0)"><g data-mml-node="mi"><path data-c="1D460" d="M131 289Q131 321 147 354T203 415T300 442Q362 442 390 415T419 355Q419 323 402 308T364 292Q351 292 340 300T328 326Q328 342 337 354T354 372T367 378Q368 378 368 379Q368 382 361 388T336 399T297 405Q249 405 227 379T204 326Q204 301 223 291T278 274T330 259Q396 230 396 163Q396 135 385 107T352 51T289 7T195 -10Q118 -10 86 19T53 87Q53 126 74 143T118 160Q133 160 146 151T160 120Q160 94 142 76T111 58Q109 57 108 57T107 55Q108 52 115 47T146 34T201 27Q237 27 263 38T301 66T318 97T323 122Q323 150 302 164T254 181T195 196T148 231Q131 256 131 289Z"></path></g><g data-mml-node="mo" transform="translate(502,363) scale(0.707)"><path data-c="2032" d="M79 43Q73 43 52 49T30 61Q30 68 85 293T146 528Q161 560 198 560Q218 560 240 545T262 501Q262 496 260 486Q259 479 173 263T84 45T79 43Z"></path></g></g><g data-mml-node="mo" transform="translate(1886.5,0) translate(0 -0.5)"><path data-c="7C" d="M139 -249H137Q125 -249 119 -235V251L120 737Q130 750 139 750Q152 750 159 735V-235Q151 -249 141 -249H139Z"></path></g><g data-mml-node="mi" transform="translate(2164.5,0)"><path data-c="1D460" d="M131 289Q131 321 147 354T203 415T300 442Q362 442 390 415T419 355Q419 323 402 308T364 292Q351 292 340 300T328 326Q328 342 337 354T354 372T367 378Q368 378 368 379Q368 382 361 388T336 399T297 405Q249 405 227 379T204 326Q204 301 223 291T278 274T330 259Q396 230 396 163Q396 135 385 107T352 51T289 7T195 -10Q118 -10 86 19T53 87Q53 126 74 143T118 160Q133 160 146 151T160 120Q160 94 142 76T111 58Q109 57 108 57T107 55Q108 52 115 47T146 34T201 27Q237 27 263 38T301 66T318 97T323 122Q323 150 302 164T254 181T195 196T148 231Q131 256 131 289Z"></path></g><g data-mml-node="mo" transform="translate(2633.5,0)"><path data-c="2C" d="M78 35T78 60T94 103T137 121Q165 121 187 96T210 8Q210 -27 201 -60T180 -117T154 -158T130 -185T117 -194Q113 -194 104 -185T95 -172Q95 -168 106 -156T131 -126T157 -76T173 -3V9L172 8Q170 7 167 6T161 3T152 1T140 0Q113 0 96 17Z"></path></g><g data-mml-node="mi" transform="translate(3078.1,0)"><path data-c="1D44E" d="M33 157Q33 258 109 349T280 441Q331 441 370 392Q386 422 416 422Q429 422 439 414T449 394Q449 381 412 234T374 68Q374 43 381 35T402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487Q506 153 506 144Q506 138 501 117T481 63T449 13Q436 0 417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157ZM351 328Q351 334 346 350T323 385T277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q217 26 254 59T298 110Q300 114 325 217T351 328Z"></path></g><g data-mml-node="mo" transform="translate(3607.1,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container>: Transition probability  </li>
+<li><mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="6.044ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 2671.7 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D45F" d="M21 287Q22 290 23 295T28 317T38 348T53 381T73 411T99 433T132 442Q161 442 183 430T214 408T225 388Q227 382 228 382T236 389Q284 441 347 441H350Q398 441 422 400Q430 381 430 363Q430 333 417 315T391 292T366 288Q346 288 334 299T322 328Q322 376 378 392Q356 405 342 405Q286 405 239 331Q229 315 224 298T190 165Q156 25 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 114 189T154 366Q154 405 128 405Q107 405 92 377T68 316T57 280Q55 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(451,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(840,0)"><path data-c="1D460" d="M131 289Q131 321 147 354T203 415T300 442Q362 442 390 415T419 355Q419 323 402 308T364 292Q351 292 340 300T328 326Q328 342 337 354T354 372T367 378Q368 378 368 379Q368 382 361 388T336 399T297 405Q249 405 227 379T204 326Q204 301 223 291T278 274T330 259Q396 230 396 163Q396 135 385 107T352 51T289 7T195 -10Q118 -10 86 19T53 87Q53 126 74 143T118 160Q133 160 146 151T160 120Q160 94 142 76T111 58Q109 57 108 57T107 55Q108 52 115 47T146 34T201 27Q237 27 263 38T301 66T318 97T323 122Q323 150 302 164T254 181T195 196T148 231Q131 256 131 289Z"></path></g><g data-mml-node="mo" transform="translate(1309,0)"><path data-c="2C" d="M78 35T78 60T94 103T137 121Q165 121 187 96T210 8Q210 -27 201 -60T180 -117T154 -158T130 -185T117 -194Q113 -194 104 -185T95 -172Q95 -168 106 -156T131 -126T157 -76T173 -3V9L172 8Q170 7 167 6T161 3T152 1T140 0Q113 0 96 17Z"></path></g><g data-mml-node="mi" transform="translate(1753.7,0)"><path data-c="1D44E" d="M33 157Q33 258 109 349T280 441Q331 441 370 392Q386 422 416 422Q429 422 439 414T449 394Q449 381 412 234T374 68Q374 43 381 35T402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487Q506 153 506 144Q506 138 501 117T481 63T449 13Q436 0 417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157ZM351 328Q351 334 346 350T323 385T277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q217 26 254 59T298 110Q300 114 325 217T351 328Z"></path></g><g data-mml-node="mo" transform="translate(2282.7,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container>: Reward function  </li>
+<li><mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.489ex;" xmlns="http://www.w3.org/2000/svg" width="1.229ex" height="1.486ex" role="img" focusable="false" viewBox="0 -441 543 657"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D6FE" d="M31 249Q11 249 11 258Q11 275 26 304T66 365T129 418T206 441Q233 441 239 440Q287 429 318 386T371 255Q385 195 385 170Q385 166 386 166L398 193Q418 244 443 300T486 391T508 430Q510 431 524 431H537Q543 425 543 422Q543 418 522 378T463 251T391 71Q385 55 378 6T357 -100Q341 -165 330 -190T303 -216Q286 -216 286 -188Q286 -138 340 32L346 51L347 69Q348 79 348 100Q348 257 291 317Q251 355 196 355Q148 355 108 329T51 260Q49 251 47 251Q45 249 31 249Z"></path></g></g></g></svg></mjx-container>: Discount factor</li>
+</ul>
+<p>The objective is to find a policy <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="5.937ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 2624 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D70B" d="M132 -11Q98 -11 98 22V33L111 61Q186 219 220 334L228 358H196Q158 358 142 355T103 336Q92 329 81 318T62 297T53 285Q51 284 38 284Q19 284 19 294Q19 300 38 329T93 391T164 429Q171 431 389 431Q549 431 553 430Q573 423 573 402Q573 371 541 360Q535 358 472 358H408L405 341Q393 269 393 222Q393 170 402 129T421 65T431 37Q431 20 417 5T381 -10Q370 -10 363 -7T347 17T331 77Q330 86 330 121Q330 170 339 226T357 318T367 358H269L268 354Q268 351 249 275T206 114T175 17Q164 -11 132 -11Z"></path></g><g data-mml-node="mo" transform="translate(570,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(959,0)"><path data-c="1D44E" d="M33 157Q33 258 109 349T280 441Q331 441 370 392Q386 422 416 422Q429 422 439 414T449 394Q449 381 412 234T374 68Q374 43 381 35T402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487Q506 153 506 144Q506 138 501 117T481 63T449 13Q436 0 417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157ZM351 328Q351 334 346 350T323 385T277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q217 26 254 59T298 110Q300 114 325 217T351 328Z"></path></g><g data-mml-node="mo" transform="translate(1488,0) translate(0 -0.5)"><path data-c="7C" d="M139 -249H137Q125 -249 119 -235V251L120 737Q130 750 139 750Q152 750 159 735V-235Q151 -249 141 -249H139Z"></path></g><g data-mml-node="mi" transform="translate(1766,0)"><path data-c="1D460" d="M131 289Q131 321 147 354T203 415T300 442Q362 442 390 415T419 355Q419 323 402 308T364 292Q351 292 340 300T328 326Q328 342 337 354T354 372T367 378Q368 378 368 379Q368 382 361 388T336 399T297 405Q249 405 227 379T204 326Q204 301 223 291T278 274T330 259Q396 230 396 163Q396 135 385 107T352 51T289 7T195 -10Q118 -10 86 19T53 87Q53 126 74 143T118 160Q133 160 146 151T160 120Q160 94 142 76T111 58Q109 57 108 57T107 55Q108 52 115 47T146 34T201 27Q237 27 263 38T301 66T318 97T323 122Q323 150 302 164T254 181T195 196T148 231Q131 256 131 289Z"></path></g><g data-mml-node="mo" transform="translate(2235,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg></mjx-container> that maximizes the expected cumulative reward:</p>
+<p>$$<br>J(\pi) = \mathbb{E}<em>\pi\left[\sum</em>{t=0}^\infty \gamma^t r(s_t, a_t)\right]<br>$$</p>
+<p>In contrast, Inverse Reinforcement Learning seeks to infer the underlying reward function <em>r</em> given observed expert behavior, typically in the form of state-action trajectories. The goal is to find a reward function under which the expert’s policy is optimal.</p>
+<h3 id="2-2-Representative-IRL-Algorithms"><a href="#2-2-Representative-IRL-Algorithms" class="headerlink" title="2.2 Representative IRL Algorithms"></a>2.2 Representative IRL Algorithms</h3><h4 id="2-2-1-Linear-Programming-IRL-Ng-Russell-2000"><a href="#2-2-1-Linear-Programming-IRL-Ng-Russell-2000" class="headerlink" title="2.2.1 Linear Programming IRL (Ng & Russell, 2000)"></a>2.2.1 Linear Programming IRL (Ng &amp; Russell, 2000)</h4><p>Abbeel &amp; Ng 提出 <strong>学徒学习（Apprenticeship Learning）</strong>，利用专家示范数据估计特征期望 μ_E，并通过最大间隔优化，迭代地生成能使 μ(π) 与 μ_E 逼近的策略。其核心优化目标为：<br>[<br>\max_{w} ; \min_{\pi \in \Pi} ; w^\top (\mu_E - \mu(\pi)),\quad |w|_2 \le 1<br>]<br>通过对偶算法等手段高效求解 :contentReference[oaicite:2]{index=2}。</p>
+<h4 id="2-2-1"><a href="#2-2-1" class="headerlink" title="2.2.1"></a>2.2.1</h4><p>为解决多解性与不确定性，最大熵 IRL 在策略分布上引入熵项，定义轨迹 τ 的概率为：<br>[<br>P(τ|w) \propto \exp\bigl(\sum_{t} w^\top \phi(s_t)\bigr)<br>]<br>通过极大化示范轨迹的对数似然并加入熵正则化，实现对专家行为分布的平滑拟合 :contentReference[oaicite:3]{index=3}。</p>
+<hr>
+<h2 id="3-Morden-IRL"><a href="#3-Morden-IRL" class="headerlink" title="3. Morden IRL"></a>3. Morden IRL</h2><p>Arora &amp; Doshi (2018) 系统综述了 IRL 的核心挑战，包括  </p>
+<ol>
+<li><strong>推断准确性</strong>：受限于状态空间维度与示范质量  </li>
+<li><strong>泛化能力</strong>：奖励函数在新场景的迁移性  </li>
+<li><strong>计算复杂度</strong>：解空间随任务规模指数增长 :contentReference[oaicite:4]{index=4}</li>
+</ol>
+<p>他们分类讨论了处理不完全观测、模型不确定、多重奖励与非线性奖励的方法，为后续研究指明了方向。</p>
+<hr>
+<h2 id="4-IRL-for-LLMs"><a href="#4-IRL-for-LLMs" class="headerlink" title="4. IRL for LLMs"></a>4. IRL for LLMs</h2><h3 id="4-1-对抗逆强化学习-Adversarial-IRL"><a href="#4-1-对抗逆强化学习-Adversarial-IRL" class="headerlink" title="4.1 对抗逆强化学习 (Adversarial IRL)"></a>4.1 对抗逆强化学习 (Adversarial IRL)</h3><p>Fu et al. (2017) 将 GAN 思想引入 IRL，通过生成网络生成策略、判别网络区分专家/策略轨迹，优化目标为<br>[<br>\min_\pi \max_D ; \mathbb{E}<em>{τ\sim\pi_E}[\log D(τ)] + \mathbb{E}</em>{τ\sim\pi}[\log(1 - D(τ))]<br>]<br>有效提升了在复杂环境下的学习效率与鲁棒性 :contentReference[oaicite:5]{index=5}。</p>
+<h3 id="4-2-贝叶斯-IRL"><a href="#4-2-贝叶斯-IRL" class="headerlink" title="4.2 贝叶斯 IRL"></a>4.2 贝叶斯 IRL</h3><p>Ramachandran &amp; Amir (2007) 将奖励函数视为随机变量，利用贝叶斯推断计算后验分布：<br>[<br>P(R|D) \propto P(D|R),P(R)<br>]<br>其中 (P(D|R)) 表示在给定奖励下生成专家示范的概率，增强了对示范噪声的鲁棒性 :contentReference[oaicite:6]{index=6}。</p>
+<h3 id="4-3-深度成本学习-Guided-Cost-Learning"><a href="#4-3-深度成本学习-Guided-Cost-Learning" class="headerlink" title="4.3 深度成本学习 (Guided Cost Learning)"></a>4.3 深度成本学习 (Guided Cost Learning)</h3><p>Finn et al. (2016) 以最大熵 IRL 为基础，采用神经网络拟合奖励函数，并结合策略优化，提出目标：<br>[<br>\min_θ ; -\sum_{τ \in D_E} \log P(τ|θ) + \lambda \sum_{τ \in D_{π_θ}} \exp\bigl(\sum_t r_θ(s_t)\bigr)<br>]<br>显著提升了高维连续控制场景下的性能 :contentReference[oaicite:7]{index=7}。</p>
+<h3 id="4-4-相对熵-IRL-Relative-Entropy-IRL"><a href="#4-4-相对熵-IRL-Relative-Entropy-IRL" class="headerlink" title="4.4 相对熵 IRL (Relative Entropy IRL)"></a>4.4 相对熵 IRL (Relative Entropy IRL)</h3><p>Boularias et al. (2011) 通过最小化策略分布与专家分布的相对熵，实现奖励函数学习：<br>[<br>\min_R ; D_{\mathrm{KL}}\bigl(P(τ|\pi_E),|,P(τ|\pi_R)\bigr)<br>]<br>简化了对最优策略求解的依赖，提高了样本效率 :contentReference[oaicite:8]{index=8}。</p>
+<hr>
+<h2 id="5-Future-Outlook"><a href="#5-Future-Outlook" class="headerlink" title="5. Future Outlook"></a>5. Future Outlook</h2><p><strong>I​mitating Language via Scalable IRL</strong> (2024) 将 IRL 应用于大语言模型的微调，提出“逆软 Q 学习”（Inverse Soft Q‑Learning）：<br>[<br>L_{\mathrm{IRL}} = -\sum_{x,y}\bigl[Q(s,a) - \gamma,V(s’)\bigr] + \alpha,|\theta|^2<br>]<br>其中 Q 与 V 由模型参数 θ 定义，并结合时序差分正则化，以序列级别的“未来影响”替代逐 token 的 MLE 优化，从而提高生成连贯性与对齐度 :contentReference[oaicite:9]{index=9}。</p>
+<hr>
+<h2 id="6-Reference"><a href="#6-Reference" class="headerlink" title="6. Reference"></a>6. Reference</h2><p>逆强化学习自 Ng &amp; Russell (2000) 的 LP 框架，到最大熵 IRL 与现代对抗／贝叶斯方法，再到可扩展 IRL 在 LLM 微调中的应用，已形成从理论到实践的完整谱系。面向大模型的 IRL 可将对齐问题转化为<strong>序列级奖励推断</strong>，为下一代高质量、可控生成模型提供了新的思路。未来可结合在线／离线混合训练、多源偏好数据融合及不确定性驱动采样机制，进一步提升 IRL 在大规模场景中的可扩展性与稳健性。  </p>
 
 		</div>
 
@@ -770,7 +686,7 @@ L_{\mathrm{IRL}} = -\sum_{x,y}\bigl[Q(s,a) - \gamma\,V(s')\bigr] + \alpha\,\|\th
         
             <li>
                 <strong>Updated at
-                    :</strong> 2025-04-22 20:24:13
+                    :</strong> 2025-04-22 21:23:19
             </li>
         
         <li>
@@ -841,7 +757,7 @@ L_{\mathrm{IRL}} = -\sum_{x,y}\bigl[Q(s,a) - \gamma\,V(s')\bigr] + \alpha\,\|\th
 	<div class="post-toc">
 		<div class="toc-title">On this page</div>
 		<div class="page-title">&#39;Inverse&#39; is All you Need</div>
-		
+		<ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Abstract"><span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Introduction-Why-We-Need-%E2%80%9CI%E2%80%9D"><span class="nav-text">1. Introduction : Why We Need “I”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Traditional-IRL"><span class="nav-text">2. Traditional IRL</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-Reinforcement-Learning-vs-Inverse-Reinforcement-Learning"><span class="nav-text">2.1 Reinforcement Learning vs. Inverse Reinforcement Learning</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Representative-IRL-Algorithms"><span class="nav-text">2.2 Representative IRL Algorithms</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Morden-IRL"><span class="nav-text">3. Morden IRL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-IRL-for-LLMs"><span class="nav-text">4. IRL for LLMs</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E5%AF%B9%E6%8A%97%E9%80%86%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0-Adversarial-IRL"><span class="nav-text">4.1 对抗逆强化学习 (Adversarial IRL)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E8%B4%9D%E5%8F%B6%E6%96%AF-IRL"><span class="nav-text">4.2 贝叶斯 IRL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-%E6%B7%B1%E5%BA%A6%E6%88%90%E6%9C%AC%E5%AD%A6%E4%B9%A0-Guided-Cost-Learning"><span class="nav-text">4.3 深度成本学习 (Guided Cost Learning)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-%E7%9B%B8%E5%AF%B9%E7%86%B5-IRL-Relative-Entropy-IRL"><span class="nav-text">4.4 相对熵 IRL (Relative Entropy IRL)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Future-Outlook"><span class="nav-text">5. Future Outlook</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-Reference"><span class="nav-text">6. Reference</span></a></li></ol>
 
 	</div>
 </div>
