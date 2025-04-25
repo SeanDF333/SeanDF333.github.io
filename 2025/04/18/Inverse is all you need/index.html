@@ -30,7 +30,7 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://seandf333.github.io/images/redefine-og.webp">
 <meta property="article:published_time" content="2025-04-17T16:00:00.000Z">
-<meta property="article:modified_time" content="2025-04-25T05:15:36.706Z">
+<meta property="article:modified_time" content="2025-04-25T05:38:15.636Z">
 <meta property="article:author" content="Xiaoyan Fan">
 <meta property="article:tag" content="IRL">
 <meta property="article:tag" content="RL">
@@ -569,8 +569,8 @@ mjx-container[display="true"] + br {
     
         <span class="article-date article-meta-item">
             <i class="fa-regular fa-wrench"></i>&nbsp;
-            <span class="desktop">2025-04-25 13:15:36</span>
-            <span class="mobile">2025-04-25 13:15:36</span>
+            <span class="desktop">2025-04-25 13:38:15</span>
+            <span class="mobile">2025-04-25 13:38:15</span>
             <span class="hover-info">Updated</span>
         </span>
     
@@ -665,7 +665,57 @@ mjx-container[display="true"] + br {
 </li>
 </ul>
 <hr>
-<h4 id="2-2-1"><a href="#2-2-1" class="headerlink" title="2.2.1"></a>2.2.1</h4><p>为解决多解性与不确定性，最大熵 IRL 在策略分布上引入熵项，定义轨迹 τ 的概率为：<br>[<br>P(τ|w) \propto \exp\bigl(\sum_{t} w^\top \phi(s_t)\bigr)<br>]<br>通过极大化示范轨迹的对数似然并加入熵正则化，实现对专家行为分布的平滑拟合 :contentReference[oaicite:3]{index=3}。</p>
+<h4 id="2-2-2-Apprenticeship-learning-Abbeel-P-Ng-A-Y-2004"><a href="#2-2-2-Apprenticeship-learning-Abbeel-P-Ng-A-Y-2004" class="headerlink" title="2.2.2 Apprenticeship learning (Abbeel, P., & Ng, A. Y.2004)"></a>2.2.2 Apprenticeship learning (Abbeel, P., &amp; Ng, A. Y.2004)</h4><ol>
+<li><p><strong>Initialize</strong>  </p>
+<ul>
+<li>Select an arbitrary policy (\pi^{(0)}).  </li>
+<li>Compute its feature expectations (\mu^{(0)} = \mathbb{E}<em>{\pi^{(0)}}[\sum</em>{t=0}^\infty \gamma^t \phi(s_t)]).  </li>
+<li>Set iteration counter (i \leftarrow 1).</li>
+</ul>
+</li>
+<li><p><strong>Inverse-RL Step (Max-Margin Reward Inference)</strong><br>Solve the quadratic program:<br>$$<br>w^{(i)},, t^{(i)} = \arg\max_{|w|<em>2 \le 1};\min</em>{0 \le j &lt; i}; w^\top\bigl(\hat\mu_E - \mu^{(j)}\bigr),<br>$$<br>where (\hat\mu_E) is the empirical expert feature expectation and (\mu^{(j)}) are past policy expectations.</p>
+</li>
+<li><p><strong>Convergence Check</strong>  </p>
+<ul>
+<li>If (t^{(i)} \le \varepsilon), terminate: the current set of policies matches the expert within tolerance (\varepsilon).</li>
+</ul>
+</li>
+<li><p><strong>Policy Improvement via RL</strong>  </p>
+<ul>
+<li>Define learned reward (R^{(i)}(s) = (w^{(i)})^\top \phi(s)).  </li>
+<li>Run a standard RL solver on MDP(\setminus R) augmented with (R^{(i)}) to obtain new policy (\pi^{(i)}).</li>
+</ul>
+</li>
+<li><p><strong>Update Feature Expectations</strong>  </p>
+<ul>
+<li>Compute (\mu^{(i)} = \mathbb{E}<em>{\pi^{(i)}}[\sum</em>{t=0}^\infty \gamma^t \phi(s_t)]).</li>
+</ul>
+</li>
+<li><p><strong>Iterate</strong>  </p>
+<ul>
+<li>Increment (i \leftarrow i + 1) and return to step 2.</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="Advantages-and-Limitations"><a href="#Advantages-and-Limitations" class="headerlink" title="Advantages and Limitations"></a>Advantages and Limitations</h2><h3 id="Advantages"><a href="#Advantages" class="headerlink" title="Advantages"></a>Advantages</h3><ul>
+<li><p><strong>Automatic Reward Discovery</strong><br>Learns a reward function directly from expert demonstrations, removing the need for manual reward engineering.</p>
+</li>
+<li><p><strong>Performance Guarantees</strong><br>Provably converges in (O\bigl(\tfrac{k}{(1-\gamma)^2\varepsilon^2}\ln\tfrac{k}{(1-\gamma)\varepsilon}\bigr)) iterations, yielding a policy within (\varepsilon) of the expert’s true performance.</p>
+</li>
+<li><p><strong>Sample Efficiency</strong><br>Requires fewer expert trajectories than naive imitation or parameterized policy methods to achieve comparable performance.</p>
+</li>
+</ul>
+<h3 id="Limitations"><a href="#Limitations" class="headerlink" title="Limitations"></a>Limitations</h3><ul>
+<li><p><strong>Quadratic Programming Overhead</strong><br>Each inverse-RL step relies on a QP (or SVM) solver, which can be computationally intensive for high-dimensional feature spaces.</p>
+</li>
+<li><p><strong>Feature Engineering Dependence</strong><br>Quality of learned policy hinges on the choice of features (\phi(s)); poor features lead to suboptimal behavior.</p>
+</li>
+<li><p><strong>Scalability Challenges</strong><br>As the number of features (k) or candidate policies grows, the optimization problem size increases, impacting runtime.</p>
+</li>
+<li><p><strong>Coverage Requirements</strong><br>Performance degrades if expert demonstrations do not adequately cover critical regions of the state space.</p>
+</li>
+</ul>
 <hr>
 <h2 id="3-Morden-IRL"><a href="#3-Morden-IRL" class="headerlink" title="3. Morden IRL"></a>3. Morden IRL</h2><p>Arora &amp; Doshi (2018) 系统综述了 IRL 的核心挑战，包括  </p>
 <ol>
@@ -697,7 +747,7 @@ mjx-container[display="true"] + br {
         
             <li>
                 <strong>Updated at
-                    :</strong> 2025-04-25 13:15:36
+                    :</strong> 2025-04-25 13:38:15
             </li>
         
         <li>
@@ -768,7 +818,7 @@ mjx-container[display="true"] + br {
 	<div class="post-toc">
 		<div class="toc-title">On this page</div>
 		<div class="page-title">&#39;Inverse&#39; is All you Need</div>
-		<ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Abstract"><span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Introduction-Why-We-Need-%E2%80%9CI%E2%80%9D"><span class="nav-text">1. Introduction : Why We Need “I”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Classical-IRL"><span class="nav-text">2. Classical IRL</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-Reinforcement-Learning-vs-Inverse-Reinforcement-Learning"><span class="nav-text">2.1 Reinforcement Learning vs. Inverse Reinforcement Learning</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Representative-IRL-Algorithms"><span class="nav-text">2.2 Representative IRL Algorithms</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Morden-IRL"><span class="nav-text">3. Morden IRL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-IRL-for-LLMs"><span class="nav-text">4. IRL for LLMs</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E5%AF%B9%E6%8A%97%E9%80%86%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0-Adversarial-IRL"><span class="nav-text">4.1 对抗逆强化学习 (Adversarial IRL)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E8%B4%9D%E5%8F%B6%E6%96%AF-IRL"><span class="nav-text">4.2 贝叶斯 IRL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-%E6%B7%B1%E5%BA%A6%E6%88%90%E6%9C%AC%E5%AD%A6%E4%B9%A0-Guided-Cost-Learning"><span class="nav-text">4.3 深度成本学习 (Guided Cost Learning)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-%E7%9B%B8%E5%AF%B9%E7%86%B5-IRL-Relative-Entropy-IRL"><span class="nav-text">4.4 相对熵 IRL (Relative Entropy IRL)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Future-Outlook"><span class="nav-text">5. Future Outlook</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-Reference"><span class="nav-text">6. Reference</span></a></li></ol>
+		<ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Abstract"><span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Introduction-Why-We-Need-%E2%80%9CI%E2%80%9D"><span class="nav-text">1. Introduction : Why We Need “I”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Classical-IRL"><span class="nav-text">2. Classical IRL</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-Reinforcement-Learning-vs-Inverse-Reinforcement-Learning"><span class="nav-text">2.1 Reinforcement Learning vs. Inverse Reinforcement Learning</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Representative-IRL-Algorithms"><span class="nav-text">2.2 Representative IRL Algorithms</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Advantages-and-Limitations"><span class="nav-text">Advantages and Limitations</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Advantages"><span class="nav-text">Advantages</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Limitations"><span class="nav-text">Limitations</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Morden-IRL"><span class="nav-text">3. Morden IRL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-IRL-for-LLMs"><span class="nav-text">4. IRL for LLMs</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E5%AF%B9%E6%8A%97%E9%80%86%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0-Adversarial-IRL"><span class="nav-text">4.1 对抗逆强化学习 (Adversarial IRL)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E8%B4%9D%E5%8F%B6%E6%96%AF-IRL"><span class="nav-text">4.2 贝叶斯 IRL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-%E6%B7%B1%E5%BA%A6%E6%88%90%E6%9C%AC%E5%AD%A6%E4%B9%A0-Guided-Cost-Learning"><span class="nav-text">4.3 深度成本学习 (Guided Cost Learning)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-%E7%9B%B8%E5%AF%B9%E7%86%B5-IRL-Relative-Entropy-IRL"><span class="nav-text">4.4 相对熵 IRL (Relative Entropy IRL)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Future-Outlook"><span class="nav-text">5. Future Outlook</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-Reference"><span class="nav-text">6. Reference</span></a></li></ol>
 
 	</div>
 </div>
