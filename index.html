@@ -27,6 +27,7 @@
             <a href="#research">Research</a>
             <a href="#experience">Experience</a>
             <a href="#hobbies">Life</a>
+            <a href="#world">World</a>
             <a href="#contact">Contact</a>
         </div>
     </nav>
@@ -347,6 +348,34 @@
         </div>
     </div>
 
+    <!-- World Map -->
+    <section class="section section-tinted fade-section" id="world">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label">World</span>
+                <div class="section-rule"></div>
+            </div>
+            <div class="map-wrap">
+                <svg id="travel-map"></svg>
+                <div class="map-tooltip" id="mapTooltip"></div>
+            </div>
+            <div class="map-legend">
+                <div class="legend-item">
+                    <div class="legend-country"></div>
+                    <span>Visited country</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot"></div>
+                    <span>City</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-rooted"></div>
+                    <span>Rooted</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Contact -->
     <section class="section fade-section" id="contact">
         <div class="container">
@@ -372,6 +401,8 @@
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
     <script src="main.js"></script>
 </body>
 </html>
