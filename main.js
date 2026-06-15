@@ -131,7 +131,7 @@ document.addEventListener('keydown', e => {
 
 // ===== TRAVEL MAP =====
 (async function () {
-    const VISITED = new Set([156, 458, 702, 392, 462]); // China, Malaysia, Singapore, Japan, Maldives
+    const VISITED = new Set([156, 158, 458, 702, 392, 462]); // China+Taiwan, Malaysia, Singapore, Japan, Maldives
 
     const CITIES = [
         // China
