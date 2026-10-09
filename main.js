@@ -142,7 +142,7 @@ document.addEventListener('keydown', e => {
         { name: 'Ezhou',         lon: 114.894, lat: 30.391 },
         { name: 'Beijing',       lon: 116.407, lat: 39.904, rooted: true },
         { name: 'Shanghai',      lon: 121.474, lat: 31.230, rooted: true },
-        { name: 'Guangzhou',     lon: 113.264, lat: 23.129 },
+        { name: 'Guangzhou',     lon: 113.264, lat: 23.129, rooted: true },
         { name: 'Shenzhen',      lon: 114.058, lat: 22.543 },
         { name: 'Hangzhou',      lon: 120.155, lat: 30.274 },
         { name: 'Chengdu',       lon: 104.067, lat: 30.573 },
@@ -240,9 +240,9 @@ document.addEventListener('keydown', e => {
             .attr('stroke-width', 1)
             .attr('opacity', 0.45);
 
-        // City dots
+        // Rooted dots below ordinary city dots, so nearby small markers stay visible.
         svg.selectAll('.city-dot')
-            .data(CITIES)
+            .data([...CITIES.filter(d => d.rooted), ...CITIES.filter(d => !d.rooted)])
             .enter().append('circle')
             .attr('class', 'city-dot')
             .attr('cx', d => projection([d.lon, d.lat])[0])
